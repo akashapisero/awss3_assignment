@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:file="http://www.mulesoft.org/schema/mule/file" xmlns:sns="http://www.mulesoft.org/schema/mule/sns"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:s3="http://www.mulesoft.org/schema/mule/s3" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/s3 http://www.mulesoft.org/schema/mule/s3/current/mule-s3.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/sns http://www.mulesoft.org/schema/mule/sns/current/mule-sns.xsd
+http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="5cc0981a-a242-4585-9099-8dc2611e69cb" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<s3:config name="Amazon_S3_Configuration" doc:name="Amazon S3 Configuration" doc:id="2aa7b6c0-0b3d-4cad-9a60-430c89c5368c" >
+		<s3:basic-connection accessKey="${accessKey}" secretKey="${secretKey}" />
+	</s3:config>
+	<sns:config name="Amazon_SNS_configuration" doc:name="Amazon SNS configuration" doc:id="3f1c9661-377e-4833-b33b-c1a492c3f0e7" >
+		<sns:basic-connection accessKey="AKIAJWKZDPLHRO4WPP7A" secretKey=" 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" />
+	</sns:config>
+	<flow name="aws_assignmentFlow" doc:id="c685583b-b07c-4512-9602-d01eba7f1fbb" >
+		<http:listener doc:name="Listener" doc:id="2a8f284e-e380-4594-9610-6f411eeca1f5" config-ref="HTTP_Listener_config" path="/aws"/>
+		<ee:transform doc:name="Transform Message" doc:id="a9cdea30-4811-4944-a86d-28960405c134">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="594f111c-8785-42d6-88a0-91de2aa4e1ce" message="Message: #[payload]"/>
+		<s3:get-object doc:name="Get object" doc:id="6e149484-4699-454c-82ed-22f46486a2c6" config-ref="Amazon_S3_Configuration" bucketName="bucket-apisero-akash" key="#[payload..key]"/>
+		<logger level="INFO" doc:name="Logger" doc:id="553c395c-ba1a-4fde-bf95-797528bf3325" message="#[payload]"/>
+	</flow>
+</mule>
