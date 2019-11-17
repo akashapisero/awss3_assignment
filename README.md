@@ -6,6 +6,9 @@ bucket-apisero-akash
 #arn:
 arn:aws:sns:us-east-1:211556697089:akash-topic
 
+#Topic name:
+akash-topic
+
 #cloudhub endpoint:
 http://aws-assignment.us-e2.cloudhub.io/aws
 
